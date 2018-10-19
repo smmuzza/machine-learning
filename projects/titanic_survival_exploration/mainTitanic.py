@@ -81,3 +81,63 @@ predictions = predictions_1(data)
 
 # Display results with the new prediction criteria
 print(accuracy_score(outcomes, predictions))
+
+vs.survival_stats(data, outcomes, 'Age', ["Sex == 'male'"])
+vs.survival_stats(data, outcomes, 'Age', ["Sex == 'female'"])
+
+def predictions_2(data):
+    """ Model with two features: 
+            - Predict a passenger survived if they are female.
+            - Predict a passenger survived if they are male and younger than 10. """
+    
+    predictions = []
+    for _, passenger in data.iterrows():
+        
+        # Remove the 'pass' statement below 
+        # and write your prediction conditions here
+        if passenger['Sex'] == 'female':
+            predictions.append(1)
+        elif passenger['Sex'] == 'male' and  passenger['Age'] < 10:
+            predictions.append(1)
+        else:
+            predictions.append(0)
+    
+    # Return our predictions
+    return pd.Series(predictions)
+
+# Make the predictions
+predictions = predictions_2(data)
+
+# Display results with the new prediction criteria
+print(accuracy_score(outcomes, predictions))
+
+vs.survival_stats(data, outcomes, 'Pclass', ["Sex == 'male'"])
+vs.survival_stats(data, outcomes, 'Pclass', ["Sex == 'female'"])
+vs.survival_stats(data, outcomes, 'SibSp', ["Sex == 'male'"])
+vs.survival_stats(data, outcomes, 'SibSp', ["Sex == 'female'"])
+vs.survival_stats(data, outcomes, 'Parch', ["Sex == 'male'"])
+vs.survival_stats(data, outcomes, 'Parch', ["Sex == 'female'"])
+
+def predictions_3(data):
+    """ Model with multiple features. Makes a prediction with an accuracy of at least 80%. """
+    
+    predictions = []
+    for _, passenger in data.iterrows():
+        
+        # Remove the 'pass' statement below 
+        # and write your prediction conditions here
+        #Pclass, Sex, Age, SibSp, and Parch
+        if passenger['Sex'] == 'female' and (passenger['SibSp'] < 3) and (passenger['Parch'] < 4):
+            predictions.append(1)
+        elif passenger['Sex'] == 'male' and  passenger['Age'] < 10:
+            predictions.append(1)
+        else:
+            predictions.append(0)    
+    # Return our predictions
+    return pd.Series(predictions)
+
+# Make the predictions
+predictions = predictions_3(data)
+
+# Display results with the new prediction criteria
+print(accuracy_score(outcomes, predictions))
