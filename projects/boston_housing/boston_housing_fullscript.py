@@ -128,3 +128,65 @@ Underfitting is usually the result of having not enough data to train the approp
 
 If the model is "just-right" is should neither under-fit nor over-fit, and hence perform well on both the test set and the training set.
 """
+
+# Produce learning curves for varying training set sizes and maximum depths
+vs.ModelLearning(features, prices)
+
+vs.ModelComplexity(X_train, y_train)
+
+"""
+
+QUESTION 4:
+
+"Choose one of the graphs above and state the maximum depth for the model. "
+--> Max depth = 3
+
+"What happens to the score of the training curve as more training points are added? What about the testing curve?"
+--> For max depth = 3, the training curve and testing curve both converge to around 0.8
+
+"Would having more training points benefit the model? "
+--> Probably not. After around 300 both the training and test curves seems to plateau 
+
+QUESTION 5:
+
+"When the model is trained with a maximum depth of 1, does the model suffer from high bias or from high variance?"
+--> High bias. Since the training score is not good and does not increase as more points are added, it is suggestive of suffering from high bias. 
+
+"How about when the model is trained with a maximum depth of 10? What visual cues in the graph justify your conclusions?"
+--> In this case the there is a large gap between the good training score and the poor test score. This suggests overfitting as the model cannot generalise well to the data in the test set. 
+
+QUESTION 6:
+
+"Which maximum depth do you think results in a model that best generalizes to unseen data? "
+--> 4
+
+"What intuition lead you to this answer?"
+--> The answer above for Question-5 "Bias-Variance Tradeoff", also aligns with the complexity curve, where the validation score peaks at a depth of around 4 (hence poor complexity performance for model depth 1), and variance (lighter green area around the dark green mean) increases as the depth increases (hence large variance for model depth 10). 
+
+In model depth 3 we have good convergence of both training and test curves, and in model depth 6 we have some divergence of test and training curves, but better performance on the test set. The plots of training-test learning curves, combined with the complexity graph, indicate a sweet-spot trade off between test set performance and training set performance somewhere around model depth 4.
+"""
+
+"""
+
+QUESTION 7:
+
+The "grid" represents the search space of the model, akin to degrees of freedom or ways in which them model can move. A model based on these "hyper-parameters" are the things that have to be trained and tested against. For example, a hyper parameter of a decision tree is depth, for a neural network can be the number of hidden layers, and for a polynomial the degree of the polynomial.
+
+To test how well these parameters are working, the model can be executed with these parameters in place, and its predictive power compared against the results of a test set as ground truth. The results of the model prediction against the test set are often compared staticially with things like recall, precision, F1 (harmonic mean based), F-Beta score (weighted F1 score), ROC cuves, and R2 scores.
+
+QUESTION 8:
+
+"What is the k-fold cross-validation training technique?" 
+--> This refers to the approach of (ideally randomizing then) breaking up the data into k buckets, training k times, and averaging results to get a final model. From the k buckets/subsamples, a single bucket/subsample is retained as validation data for testing, while the remaining k − 1 buckets/subsamples for training. This techinique is referred to as a type of "out of order sampling" or "rotation estimation".
+
+Because the results of all k-1 trained models are averaged, the chance that overfitting is reduced as it is unlikley that an over-fitted model will perform well on a test set and all of the training sets. In other words, to perform well on many different training sets and the final test set the model has have general predictive power than is independent of one particular data set.
+
+It is important to randomize both data and the training process. This helps to remove any chance of that the data or the training process and its ordering will introduce bias, "leak" knoweldge of the test set into the model and causing it to overfit. When adjusting a model without the k buckets in k-fold cross-validation, there is the risk that the training process can become corrupted as we keep training and tweaking and tuning until we do well on the test set, indirectly imparting knowledge of the test set into the model. This increases the of overfitting, and means that the model may no longer generalize well to data outside of the test set.
+
+In addition to, or instead of, k-fold cross-validation, yet another part of the dataset can be held out as "validation set". After training, the model is compared against the validation set, then finally against the test set, and has to perform well against both. However, only the validation set performance can be used for model selection and choice of hyper-parameters. The test set must be left isolated from model selection, least it become corrupted as described above.
+"""
+
+# IMPLEMENTATION: FITTING A MODEL
+# The 'max_depth' parameter can be thought of as how many questions 
+# the decision tree algorithm is allowed to ask about the data before making a prediction
+
