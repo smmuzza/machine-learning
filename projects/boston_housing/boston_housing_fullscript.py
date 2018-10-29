@@ -190,3 +190,94 @@ In addition to, or instead of, k-fold cross-validation, yet another part of the 
 # The 'max_depth' parameter can be thought of as how many questions 
 # the decision tree algorithm is allowed to ask about the data before making a prediction
 
+# Import 'make_scorer', 'DecisionTreeRegressor', and 'GridSearchCV'
+from sklearn.metrics import make_scorer 
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import GridSearchCV
+
+def fit_model(X, y):
+    """ Performs grid search over the 'max_depth' parameter for a 
+        decision tree regressor trained on the input data [X, y]. """
+    
+    # Create cross-validation sets from the training data
+    cv_sets = ShuffleSplit(n_splits = 10, test_size = 0.20, random_state = 0)
+#    cv_sets = ShuffleSplit(X.shape[0], n_iter = 10, test_size = 0.20, random_state = 0)
+    # Create a decision tree regressor object
+    regressor = DecisionTreeRegressor(random_state = 42)
+
+    # Create a dictionary for the parameter 'max_depth' with a range from 1 to 10
+    params = {'max_depth': [1,2,3,4,5,6,7,8,9,10]}
+#    params = {'max_depth': [2, 4, 6, 8, 10],'min_samples_leaf': [2, 4, 6, 8 ,10],'min_samples_split': [2, 4, 6, 8, 10]}
+
+    # Transform 'performance_metric' into a scoring function using 'make_scorer' 
+    scoring_fnc = make_scorer(performance_metric)
+
+    # TODO: Create the grid search cv object --> GridSearchCV()
+    # Make sure to include the right parameters in the object:
+    # (estimator, param_grid, scoring, cv) which have values 'regressor', 'params', 'scoring_fnc', and 'cv_sets' respectively.
+    grid = GridSearchCV(regressor, params, scoring=scoring_fnc, cv=cv_sets)
+
+    # Fit the grid search object to the data to compute the optimal model
+    grid = grid.fit(X, y)
+
+    # Return the optimal model after fitting the data
+    return grid.best_estimator_
+
+# Fit the training data to the model using grid search
+reg = fit_model(X_train, y_train)
+
+# Produce the value for 'max_depth'
+print("Parameter 'max_depth' is {} for the optimal model.".format(reg.get_params()['max_depth']))
+
+# Produce a matrix for client data
+client_data = [[5, 17, 15], # Client 1
+               [4, 32, 22], # Client 2
+               [8, 3, 12]]  # Client 3
+
+# Show predictions
+for i, price in enumerate(reg.predict(client_data)):
+    print("Predicted selling price for Client {}'s home: ${:,.2f}".format(i+1, price))
+
+    
+vs.PredictTrials(features, prices, fit_model, client_data)    
+    
+    
+"""
+QUESTION 9:
+
+The maximum depth of the optimal model is 4. As I predicted in analysis above in question 6.
+
+It is reassuring that the results of the optimal model from fit_model match that indicated by prior analysis.
+
+"""
+
+"""
+QUESTION 10:
+
+Predicted selling price for Client 1s home: 403,025.00
+
+Predicted selling price for Client 2s home: 237,478.72
+
+Predicted selling price for Client 3s home: 931,636.36
+
+There prices seem reasonable given the values for the respective features.
+
+Client 1 seems to have an average property, and gets an average selling price. Client 2 has a lot of poverty and a high student to teacher ration, which make high selling prices unlikely. Client 3 has good scores in all 3 categories, so it makes sense to have a high expected selling price. The results make sense given a graph of the statistics for Boston properties.
+
+"""
+
+"""
+QUESTION 11:
+
+Data collected in 1978 is better than noting, but hardly applicable to 2018. Some trends will likely be there, like number of rooms, proverty level, and parent to teach rations, however, these correleations will unlikely to have the same values as before, and it seems reasonable to assume that a model trained on 1978 data, even after being adjusted for inflation, could perform well on a modern 2018 data set. Likely the variance on the prediction vs. truth will be much greater.
+
+The features provided in the data set are not really sufficient to fully describe a home. Actually, it would be good to include many more features, such as plot area of the land on which the dwelling is built in the case homes. Something like the square ft of all the area under roof, plus yard, seems like relevant information. The presence of a pool would likely increase the value of a house also, though other factors like the quality of applicances in a house may be less significant as they can be easily replaced. Crime levels in the area would also likely be quite important. Overall, it would be good to have more features, and then use machine learning to decide which features are important. One the important features have been selected, the less important features could be pruned from the model to simplify it and make it faster.
+
+A range in prices by itself does not by itself tell us that the model is performing well or poorly. Considering that the range of the total data set is between about 100,000 to 1,100,000, a prediction range of 400,000 is not so surprising. Between the different trails trained with different test-train splits, the range of prices predicted for the test set is fairly consistant at about 400,000, which means that the data is unlikely to be underfitted, since the results are consistant across models trained with different training data, and the variance between the 10 trails seems fairly small, indicating the the model is probably not suffering from overfit. There results match with earlier analysis of Decision Tree Regression Learning Curve and Complexity performance for different max depth, where it was also shown that a max depth of around 4 seems to do well with regards to overfitting and overfitting, i.e. that this max depth, or number of decision to make in the tree, was "just right".
+
+Data in a urban area is unlikely to show the same correlations. For example, the value of land in an urban area is usually worth much more than the value of the home itself (at least for one family homes), whereas in a rural setting, the value of the house may be more than the value of the land. Poverty also likely manifests itself is different ways in rural areas, which tend to have less slums and other bad areas with concentrated crime. Older run down building in rural areas may have lots of rooms, but actually be worth less than well maintained or newer smaller dwellings. 
+
+It seems fair to use charactistics of the entire neighbourhood to given some kind of min and max guidance for house sales in the area, but not completely determine the value of a house. In the end the market will determine the price it is willing to pay. Each home is unique, and may deviate greatly from those around it. That said, especially in urban area, the value of the land tends to be the driving factor, and the house on top of it less so. In urban areas, there may not be a huge different in the value of the worst house and best house on the street, assuming that they both occupy similar amount of land. 
+
+""" 
+
