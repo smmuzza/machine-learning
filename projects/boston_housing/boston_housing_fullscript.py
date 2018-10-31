@@ -57,6 +57,15 @@ print("Mean price: ${}".format(mean_price))
 print("Median price ${}".format(median_price))
 print("Standard deviation of prices: ${}".format(std_price))
 
+# REF: https://docs.scipy.org/doc/numpy-1.10.4/reference/generated/numpy.amin.html
+print("\nStatistics with numpy for Boston housing dataset:\n")
+print("Minimum price: ${}".format(np.amin(data['MEDV']))) 
+print("Maximum price: ${}".format(np.amax(data['MEDV'])))
+print("Mean price: ${}".format(np.mean(data['MEDV'])))
+print("Median price ${}".format(np.median(data['MEDV'])))
+print("Standard deviation of prices: ${}".format(np.std(data['MEDV'])))
+
+
 """
 QUESTION 1:
 
@@ -206,7 +215,8 @@ def fit_model(X, y):
     regressor = DecisionTreeRegressor(random_state = 42)
 
     # Create a dictionary for the parameter 'max_depth' with a range from 1 to 10
-    params = {'max_depth': [1,2,3,4,5,6,7,8,9,10]}
+#    params = {'max_depth': [1,2,3,4,5,6,7,8,9,10]}
+    params = {'max_depth': range(1,11)}
 #    params = {'max_depth': [2, 4, 6, 8, 10],'min_samples_leaf': [2, 4, 6, 8 ,10],'min_samples_split': [2, 4, 6, 8, 10]}
 
     # Transform 'performance_metric' into a scoring function using 'make_scorer' 
