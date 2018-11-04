@@ -123,4 +123,9 @@ Hyper-parameter like depth in the Neural Network
 
 GRID SEARCH
 
+Grid-search is performed by simply picking a list of values for each parameter,
+ and trying out all possible combinations of these values. This might look 
+ methodical and exhaustive. But in truth even a random search of the parameter
+ space can be MUCH more effective than a grid search!
+
 """
