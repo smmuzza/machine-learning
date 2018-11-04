@@ -205,4 +205,85 @@ while(yhat < 0.0):
     print("attempt %s: x1*p[0] + x2*p[1] + b = %s" % (i, yhat))  
     i += 1
 
+"""
+Perceptron Algorithm
+
+1. start with random weights w1, ..., wn, b
+2. for every misclassified point x1, ..., xn:
+    2.1 if prediction = 0
+        for i=1 to n
+            wi += a*xi 
+        b += a
+    2.2 if prediction = 1
+        for i=1 to n
+            wi -= a*xi 
+        b -= a
+
+"""
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Setting the random seed, feel free to change it and see different solutions.
+np.random.seed(42)
+data = np.array(pd.read_csv('data.csv'))
+#plt.scatter(x[:,0], y)
+X = data[:,[0,1]]
+y = data[:,2]
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(X[:,0], X[:,1], y)
+
+def stepFunction(t):
+    if t >= 0:
+        return 1
+    return 0
+
+def prediction(X, W, b):
+    return stepFunction((np.matmul(X,W)+b)[0])
+
+# TODO: Fill in the code below to implement the perceptron trick.
+# The function should receive as inputs the data X, the labels y,
+# the weights W (as an array), and the bias b,
+# update the weights and bias W, b, according to the perceptron algorithm,
+# and return W and b.
+def perceptronStep(X, y, W, b, learn_rate = 0.01):
+    # Fill in code
+    for i in range(len(X)):
+        y_hat = prediction(X[i],W,b)
+#        if y[i]-y_hat == 1: # real answer 1
+#            W[0] += X[i][0]*learn_rate
+#            W[1] += X[i][1]*learn_rate
+#            b += learn_rate
+#        elif y[i]-y_hat == -1: # real answer 0
+#            W[0] -= X[i][0]*learn_rate
+#            W[1] -= X[i][1]*learn_rate
+#            b -= learn_rate
+        # faster solution replacing the if    
+        W[0] += (y[i]-y_hat) * X[i][0]*learn_rate
+        W[1] += (y[i]-y_hat) * X[i][1]*learn_rate
+        b += (y[i]-y_hat) * learn_rate
+            
+    return W, b
     
+# This function runs the perceptron algorithm repeatedly on the dataset,
+# and returns a few of the boundary lines obtained in the iterations,
+# for plotting purposes.
+# Feel free to play with the learning rate and the num_epochs,
+# and see your results plotted below.
+def trainPerceptronAlgorithm(X, y, learn_rate = 0.01, num_epochs = 25):
+    x_min, x_max = min(X.T[0]), max(X.T[0])
+    y_min, y_max = min(X.T[1]), max(X.T[1])
+    W = np.array(np.random.rand(2,1))
+    b = np.random.rand(1)[0] + x_max
+    # These are the solution lines that get plotted below.
+    boundary_lines = []
+    for i in range(num_epochs):
+        # In each epoch, we apply the perceptron step.
+        W, b = perceptronStep(X, y, W, b, learn_rate)
+        boundary_lines.append((-W[0]/W[1], -b/W[1]))
+    return boundary_lines
+
+trainPerceptronAlgorithm(X, y)
