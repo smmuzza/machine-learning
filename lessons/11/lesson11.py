@@ -164,10 +164,100 @@ sample_house = [[2.29690000e-01, 0.00000000e+00, 1.05900000e+01, 0.00000000e+00,
 prediction = model.predict(sample_house)
 print(prediction)
 
+import matplotlib.pyplot as plt
+col = x[:,0]
+print(col)
+plt.scatter(x[:,0], y)
+plt.scatter(x[:,1], y)
+plt.scatter(x[:,2], y)
+
 """
-Closed form solution
+CLOSED FORM SOLUTION
+
 Can solve mathematically for a system with N equations and N unknowns,
 linear algrebra can do this, but as N gets big it means a big matrix inversion,
 which is expensive, and something to avoid, so not generally practical.
+
+2-DIMENSIONAL CASE
+let data = x1, ..., xn
+let labels = y1, ..., yn
+let weights = w1 and w2
+
+define MSE = E(w1,w2) = 1/(2m) * sum[i=1,i=m]((yhat - y)^2)
+
+need to minimise the MSE, ignore 1/m as a normalization constant, 
+sub yhat in, therefore
+
+E(w1,w2) = 1/2 * sum[i=1,i=m]((w1*xi + w2 - y)^2)
+
+to minimise find the derivatives wrt w1 and w2 and set them to 0
+
+dE/dw1 = 0 = w1*sum(xi^2) + w2*sum(xi) - sum(xi*yi)
+dE/dw2 = 0 = w1*sum(xi) + w2*sum(1) - sum(yi)
+
+solving the simulaneous equations for w1 and w2
+
+N-DIMENSIONAL CASE
+
+Matrix math
+
+E(W) = 1/m * ((XW)' - y')(XW - y)
+
+where ((XW)' - y')(XW - y) is equivalent of a sum
+
+expanding E(W) = W'X'XW - (XW)'y - y'(XW) + y'y
+
+since (XW)'y = y'(XW), the inner product of two vectors, therefore
+E(W) = W'X'XW - 2 * (XW)'y + y'y
+
+to minimise find the derivative, using the chain rule...
+dE/dW = 2X'XW - 2 * (X)'y
+
+[need to brush up on linear algebra and calc on it]
+
+0 = 2X'XW - 2 * (X)'y
+X'XW = X'y
+W = inv(X'X)X'y
+
+however this solution is expensive for large matrix sizes       
+
+"""
+
+"""
+LINEAR REGRESSION WARNINGS
+
+- works best when the data is linear
+- sensitive to outliers
+
+POLYNOMIAL REGRESSION
+
+yhat = w1*x3 + w2*x2 + w3*x + w4 
+same as linear regression, just minimise the weights 
+
+REGULARIZATION
+
+The model takes an error and minimises it, which makes the model trained to
+fit the data set perfectly instead of generalizing
+
+take the complexity into account when calculating the error scores
+
+L1 regularization: take the abs coefficients (weights) and add them to the error
+
+L2 regularization: add the sq of the coeffecients and add them to the error
+
+Complex model gets punished more, are we punishing too much or too little?
+
+Requires low error so complexity ok, or requires simplicity and speed to ok
+with some errors?
+
+Lambda. Use this to multiply the complexity penalty by. How much to punish.
+
+Which Lambda and which regularization, L1 and L2
+
+L2 usually faster unless the data is sparse than L1 is better
+
+L1 gives feature selection. L2 no feature selection.
+
+L1 for sparse outputs. L2 for non-sparse outputs.
 
 """
