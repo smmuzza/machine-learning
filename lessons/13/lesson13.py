@@ -182,7 +182,7 @@ import pandas as pd
 from IPython.display import display # Allows the use of display() for DataFrames
 
 # Pretty display for notebooks
-%matplotlib inline
+#%matplotlib inline
 
 # Set a random seed
 import random

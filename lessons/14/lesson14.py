@@ -37,6 +37,24 @@ QUIZ: FALSE POSITIVE
 99 percent accuracty test
 1/10,000 people are sick
 
+P(easy|spam) = 1/3
+P(money|spam) = 2/3
+P(easy|ham) = 1/5
+P(easy|spam) = 1/5
+
+Go from what is known, to what is inferred.
+
+NAIVE BAYES - CONDITIONAL PROBABILITY
+
+Assume probabilities are independent. Makes algo simple and 
+fast.
+
+P(spam|easy,money) proportial:
+    P(easy|spam)P(money|spam)P(spam)= 1/12
+
+P(ham|easy,money) proportial:
+    P(easy|ham)P(money|ham)P(spam) = 1/40
 
 """
+
 
