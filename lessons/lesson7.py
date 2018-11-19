@@ -24,7 +24,7 @@ High recall for medical diagnosis,
 --> FP mistakes are ok (further testing)
 = TP / (TP+FN) -- row 1 in confusion matrix
 
-High predicsion for spam detection, 
+High precicsion for spam detection, 
 --> FN mistakes are ok (dont send real email to spam)
 = TP / (TP+FP) -- col 1 in confusion matrix
 
