@@ -5,6 +5,8 @@ Created on Wed Nov 14 21:30:09 2018
 @author: shane
 """
 
+print("\nRUNNING FINDING DONORS PROJECT...\n")
+
 # Import libraries necessary for this project
 import numpy as np
 import pandas as pd
@@ -146,6 +148,9 @@ FP = income.count() - TP # Specific to the naive case
 TN = 0 # No predicted negatives in the naive case
 FN = 0 # No predicted negatives in the naive case
 '''
+
+print("\nNaive Model Evaluation...\n")
+
 # TODO: Calculate accuracy, precision and recall
 TP = np.sum(income)
 TN = 0 # No predicted negatives in the naive case
@@ -219,10 +224,10 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
     results['acc_test'] = accuracy_score(y_test, predictions_test)
     
     # TODO: Compute F-score on the the first 300 training samples using fbeta_score()
-    results['f_train'] = fbeta_score(y_train[:300], predictions_train[:300], average=None, beta=0.5)
+    results['f_train'] = fbeta_score(y_train[:300], predictions_train[:300], average='binary', beta=0.5)
         
     # TODO: Compute F-score on the test set which is y_test
-    results['f_test'] = fbeta_score(y_test, predictions_test, average=None, beta=0.5)
+    results['f_test'] = fbeta_score(y_test, predictions_test, average='binary', beta=0.5)
        
     # Success
     print("{} trained on {} samples.".format(learner.__class__.__name__, sample_size))
@@ -234,17 +239,20 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
 Implementation: Initial Model Evaluation
 """
 
+print("\nInitial model evaluation...\n")
+
 # TODO: Import the three supervised learning models from sklearn
 from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
  
 # TODO: Initialize the three models
 clf_A = GaussianNB()
-clf_Bbackup = AdaBoostClassifier(base_estimator=RandomForestClassifier(n_estimators=2, max_depth=10, random_state=11), n_estimators=50, learning_rate=1.0, random_state=7)
-clf_B = AdaBoostClassifier(base_estimator=RandomForestClassifier(n_estimators=5, max_depth=3, random_state=11), n_estimators=200, learning_rate=1.0, random_state=7)
-clf_C = RandomForestClassifier(n_estimators=200, max_depth=20, random_state=11)
+clf_Bbackup = AdaBoostClassifier(base_estimator=RandomForestClassifier(n_estimators=5, max_depth=8, random_state=11), n_estimators=100, learning_rate=1.0, random_state=7)
+clf_B = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=6, random_state=27), n_estimators=100, learning_rate=0.25, random_state=7)
+clf_C = RandomForestClassifier(n_estimators=100, max_depth=20, random_state=11)
 clf_Cbackup = SVC(kernel='poly', degree=2, C=0.1) # SVC(kernel='rbf', gamma=27), SVC(kernel='poly', degree=10, C=0.1)
 
 # TODO: Calculate the number of samples for 1%, 10%, and 100% of the training data
@@ -267,11 +275,100 @@ for clf in [clf_A, clf_B, clf_C]:
 # Run metrics visualization for the three supervised learning models chosen
 vs.evaluate(results, accuracy, fscore)
 
+"""
+Implementation: Model Tuning
+"""
+
+# TODO: Import 'GridSearchCV', 'make_scorer', and any other necessary libraries
+from sklearn.metrics import make_scorer
+from sklearn.model_selection import GridSearchCV
+
+# TODO: Initialize the classifier
+clf = RandomForestClassifier(n_estimators=100, max_depth=20, random_state=11)
+
+# TODO: Create the parameters list you wish to tune, using a dictionary if needed.
+# HINT: parameters = {'parameter_1': [value1, value2], 'parameter_2': [value1, value2]}
+parameters = {'random_state': [11], 'n_estimators': [25, 50, 100], 'max_depth': [12, 14, 16, 18, 20],'min_samples_leaf': [1, 2, 4],'min_samples_split': [2, 4, 6]}
+
+# TODO: Make an fbeta_score scoring object using make_scorer()
+scorer = make_scorer(fbeta_score, average='binary', beta=0.5)
+
+# TODO: Perform grid search on the classifier using 'scorer' as the scoring method using GridSearchCV()
+grid_obj = GridSearchCV(clf, parameters, scoring=scorer)
+
+# TODO: Fit the grid search object to the training data and find the optimal parameters using fit()
+print("fitting grid search object to data...\n")
+grid_fit = grid_obj.fit(X_train, y_train)
+
+# Get the estimator
+print("getting best estimator...\n")
+best_clf = grid_fit.best_estimator_
+
+# Make predictions using the unoptimized and 
+print("predicting for original model and optimized model...\n")
+predictions = (clf.fit(X_train, y_train)).predict(X_test)
+best_predictions = best_clf.predict(X_test)
+
+# Report the before-and-afterscores
+print("Unoptimized model\n------")
+print("Accuracy score on testing data: {:.4f}".format(accuracy_score(y_test, predictions)))
+print("F-score on testing data: {:.4f}".format(fbeta_score(y_test, predictions, beta = 0.5)))
+print("\nOptimized Model\n------")
+print("Final accuracy score on the testing data: {:.4f}".format(accuracy_score(y_test, best_predictions)))
+print("Final F-score on the testing data: {:.4f}".format(fbeta_score(y_test, best_predictions, beta = 0.5)))
+
+print("... and explore what parameters ended up being used in the new model:\n", best_clf)
+
+"""
+Feature Importance
+"""
+
+# TODO: Import a supervised learning model that has 'feature_importances_'
+from sklearn.ensemble import RandomForestClassifier
+
+# TODO: Train the supervised model on the training set using .fit(X_train, y_train)
+model = RandomForestClassifier(n_estimators=100, max_depth=20, random_state=11)
+model.fit(X_train, y_train)
+
+# TODO: Extract the feature importances using .feature_importances_ 
+importances = model.feature_importances_
+
+# Plot
+vs.feature_plot(importances, X_train, y_train)
+
+# Import functionality for cloning a model
+from sklearn.base import clone
+
+# Reduce the feature space
+X_train_reduced = X_train[X_train.columns.values[(np.argsort(importances)[::-1])[:5]]]
+X_test_reduced = X_test[X_test.columns.values[(np.argsort(importances)[::-1])[:5]]]
+
+# Train on the "best" model found from grid search earlier
+clf = (clone(best_clf)).fit(X_train_reduced, y_train)
+
+# Make new predictions
+reduced_predictions = clf.predict(X_test_reduced)
+
+# Report scores from the final model using both versions of data
+print("Final Model trained on full data\n------")
+print("Accuracy on testing data: {:.4f}".format(accuracy_score(y_test, best_predictions)))
+print("F-score on testing data: {:.4f}".format(fbeta_score(y_test, best_predictions, beta = 0.5)))
+print("\nFinal Model trained on reduced data\n------")
+print("Accuracy on testing data: {:.4f}".format(accuracy_score(y_test, reduced_predictions)))
+print("F-score on testing data: {:.4f}".format(fbeta_score(y_test, reduced_predictions, beta = 0.5)))
 
 
+# Reduce the feature space
+X_train_reduced = X_train[X_train.columns.values[(np.argsort(importances)[::-1])[:7]]]
+X_test_reduced = X_test[X_test.columns.values[(np.argsort(importances)[::-1])[:7]]]
 
+# Train on the "best" model found from grid search earlier
+clf = (clone(best_clf)).fit(X_train_reduced, y_train)
 
+# Make new predictions
+reduced_predictions = clf.predict(X_test_reduced)
 
-
-
-
+# Report scores from the final model using both versions of data
+print("\nFinal Model trained on reduced data (top 7 features)\n------")
+print("Accuracy on testing data: {:.4f}".format(accuracy_score(y_test, reduced_predictions)))
+print("F-score on testing data: {:.4f}".format(fbeta_score(y_test, reduced_predictions, beta = 0.5)))
