@@ -201,7 +201,7 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
     
     # TODO: Fit the learner to the training data using slicing with 'sample_size' using .fit(training_features[:], training_labels[:])
     start = time() # Get start time
-    learner = learner.fit(X_train[:], y_train[:])
+    learner = learner.fit(X_train[:sample_size], y_train[:sample_size])
     end = time() # Get end time
     
     # TODO: Calculate the training time
@@ -251,7 +251,7 @@ from sklearn.ensemble import RandomForestClassifier
 # TODO: Initialize the three models
 clf_A = GaussianNB()
 clf_Bbackup = AdaBoostClassifier(base_estimator=RandomForestClassifier(n_estimators=5, max_depth=8, random_state=11), n_estimators=100, learning_rate=1.0, random_state=7)
-clf_B = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=6, random_state=27), n_estimators=100, learning_rate=0.25, random_state=7)
+clf_B = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=6, random_state=27), n_estimators=100, learning_rate=1.0, random_state=7)
 clf_C = RandomForestClassifier(n_estimators=100, max_depth=20, random_state=11)
 clf_Cbackup = SVC(kernel='poly', degree=2, C=0.1) # SVC(kernel='rbf', gamma=27), SVC(kernel='poly', degree=10, C=0.1)
 
@@ -288,7 +288,7 @@ clf = RandomForestClassifier(n_estimators=100, max_depth=20, random_state=11)
 
 # TODO: Create the parameters list you wish to tune, using a dictionary if needed.
 # HINT: parameters = {'parameter_1': [value1, value2], 'parameter_2': [value1, value2]}
-parameters = {'random_state': [11], 'n_estimators': [25, 50, 100], 'max_depth': [12, 14, 16, 18, 20],'min_samples_leaf': [1, 2, 4],'min_samples_split': [2, 4, 6]}
+parameters = {'random_state': [11], 'n_estimators': [50, 100, 200], 'max_depth': [8, 16, 24],'min_samples_leaf': [1, 4],'min_samples_split': [2, 4]}
 
 # TODO: Make an fbeta_score scoring object using make_scorer()
 scorer = make_scorer(fbeta_score, average='binary', beta=0.5)
