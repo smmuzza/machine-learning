@@ -71,6 +71,7 @@ features_raw = data.drop('income', axis = 1)
 """
 
 # Log-transform the skewed features
+# https://becominghuman.ai/how-to-deal-with-skewed-dataset-in-machine-learning-afd2928011cc
 skewed = ['capital-gain', 'capital-loss']
 features_log_transformed = pd.DataFrame(data = features_raw)
 features_log_transformed[skewed] = features_raw[skewed].apply(lambda x: np.log(x + 1))
