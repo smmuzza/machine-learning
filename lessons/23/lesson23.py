@@ -37,7 +37,36 @@ Linkage Dendrograms can be insightful.
 3. WARD'S Method
 
 
+Maximum or complete-linkage clustering 	max { d ( a , b ) : a ∈ A , b ∈ B } . 
+Minimum or single-linkage clustering 	min { d ( a , b ) : a ∈ A , b ∈ B } . 
+Mean or average linkage clustering, or UPGMA
+Ward's minimum variance criterion minimizes the total within-cluster variance.
+
 DBSCAN - Density Basesd Spacial Clustering Applications with Noise
+
+
+HIERARCHICAL Pros
+HIERARCHICAL graphs are informative, visual
+potent when underlying structure also has heirarchies, like biology
+
+HIERARCHICAL Cons
+Sensitive to outliers
+Computationally extensive
+
+
+
+DBSCAN - Density Clustering
+
+Epsilon minimum distance, plus number of points to be considered a cluster
+
+Pro - dont need to specify the number of clusters
+Pro - flexibility in shape
+Pro - robust with noise and outliers
+
+Con - border points from two clusters are the points that find them first
+Con - finding clusters of varying densities
+
+Use H DBSCAN
 
 
 
