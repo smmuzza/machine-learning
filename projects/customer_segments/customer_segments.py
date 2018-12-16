@@ -63,8 +63,8 @@ print('score is: ', score)
 # Produce a scatter matrix for each pair of features in the data
 corr = data.corr()
 import seaborn as sns
-ax = sns.heatmap(corr)
-pd.scatter_matrix(data, alpha = 0.3, figsize = (14,8), diagonal = 'kde');
+#ax = sns.heatmap(corr)
+#pd.scatter_matrix(data, alpha = 0.3, figsize = (14,8), diagonal = 'kde');
 
 # --- Implementation: Feature Scaling ---
 # TODO: Scale the data using the natural logarithm
@@ -74,7 +74,7 @@ log_data = np.log(data)
 log_samples = np.log(samples)
 
 # Produce a scatter matrix for each pair of newly-transformed features
-pd.scatter_matrix(log_data, alpha = 0.3, figsize = (14,8), diagonal = 'kde');
+#pd.scatter_matrix(log_data, alpha = 0.3, figsize = (14,8), diagonal = 'kde');
 
 # Display the log-transformed sample data
 display(log_samples)
@@ -83,25 +83,48 @@ display(log_samples)
 # --- Implementations: Outlier Detection ---
 
 # For each feature find the data points with extreme high or low values
+featureOutliers = []
+outliers  = []
 for feature in log_data.keys():
     
     # TODO: Calculate Q1 (25th percentile of the data) for the given feature
-    Q1 = np.percentile(log_data, 25)
+    Q1 = np.percentile(log_data[feature], 25)
     
     # TODO: Calculate Q3 (75th percentile of the data) for the given feature
-    Q3 = np.percentile(log_data, 75)
+    Q3 = np.percentile(log_data[feature], 75)
     
     # TODO: Use the interquartile range to calculate an outlier step (1.5 times the interquartile range)
     step = 1.5
     
     # Display the outliers
     print("Data points considered outliers for the feature '{}':".format(feature))
-    display(log_data[~((log_data[feature] >= Q1 - step) & (log_data[feature] <= Q3 + step))])
+    featureOutliers = log_data[~((log_data[feature] >= Q1 - step) & (log_data[feature] <= Q3 + step))]
+    display(featureOutliers)
+    
+    # append the outlier indices to a list
+    for i in featureOutliers.index:
+        print('outlier index: ', i)
+        outliers.append(i)
     
 # OPTIONAL: Select the indices for data points you wish to remove
-outliers  = []
 
 # Remove the outliers, if any were specified
 good_data = log_data.drop(log_data.index[outliers]).reset_index(drop = True)
 
+# --- Implementations: PCA ---
 
+# TODO: Apply PCA by fitting the good data with the same number of dimensions as features
+from sklearn.decomposition import PCA
+pca = PCA(n_components=6)
+pca.fit(good_data)
+
+# TODO: Transform log_samples using the PCA fit above
+pca_samples = pca.transform(log_samples)
+
+# Generate PCA results plot
+pca_results = vs.pca_results(good_data, pca)
+
+print(pca.explained_variance_ratio_)  
+
+# Display sample log-data after having a PCA transformation applied
+display(pd.DataFrame(np.round(pca_samples, 4), columns = pca_results.index.values))
