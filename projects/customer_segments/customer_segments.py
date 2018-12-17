@@ -155,3 +155,91 @@ display(pd.DataFrame(np.round(pca_samples, 4), columns = ['Dimension 1', 'Dimens
 
 # Create a biplot
 vs.biplot(good_data, reduced_data, pca)
+
+# ---  Implementation: Creating Clusters ---
+
+# TODO: Apply your clustering algorithm of choice to the reduced data
+from sklearn.cluster import KMeans 
+from sklearn.metrics import silhouette_score
+
+# loop through different number of initial clusters and score them
+for k in range(2, 15):
+    clusterer = KMeans(n_clusters=k)
+
+    # TODO: Predict the cluster for each data point
+    preds = clusterer.fit_predict(reduced_data) 
+
+    # TODO: Find the cluster centers
+    centers = clusterer.cluster_centers_
+
+    # TODO: Predict the cluster for each transformed sample data point
+    sample_preds = clusterer.predict(pca_samples)
+
+    # TODO: Calculate the mean silhouette coefficient for the number of clusters chosen
+    score = silhouette_score(reduced_data, preds)
+    print('K-Means silhouette_score for k: ', k, ' =', score)
+    
+# loop through different number of initial clusters and score them
+from sklearn import datasets, mixture
+for k in range(2, 15):
+    clusterer = mixture.GaussianMixture(n_components=k)
+    clusterer.fit(reduced_data)
+
+    # TODO: Predict the cluster for each data point
+    preds = clusterer.predict(reduced_data) 
+
+    # TODO: Find the cluster centers
+    centers = clusterer.means_ 
+
+    # TODO: Predict the cluster for each transformed sample data point
+    sample_preds = clusterer.predict(pca_samples)
+
+    # TODO: Calculate the mean silhouette coefficient for the number of clusters chosen
+    score = silhouette_score(reduced_data, preds)
+    print('GMM silhouette_score for k: ', k, ' =', score)
+    
+
+k = 2    
+clusterer = KMeans(n_clusters=k, random_state=11).fit(reduced_data)
+
+# TODO: Predict the cluster for each data point
+preds = clusterer.predict(reduced_data) 
+
+# TODO: Find the cluster centers
+centers = clusterer.cluster_centers_
+
+# TODO: Predict the cluster for each transformed sample data point
+sample_preds = clusterer.predict(pca_samples)
+
+# TODO: Calculate the mean silhouette coefficient for the number of clusters chosen
+score = silhouette_score(reduced_data, preds)
+print('K-Means silhouette_score for k: ', k, ' =', score)   
+    
+# Display the results of the clustering from implementation
+vs.cluster_results(reduced_data, preds, centers, pca_samples)   
+
+
+# --- Implementation: Data Recovery ---
+
+# TODO: Inverse transform the centers
+log_centers = pca.inverse_transform(centers)
+
+# TODO: Exponentiate the centers
+true_centers = np.exp(log_centers)
+
+# Display the true centers
+segments = ['Segment {}'.format(i) for i in range(0,len(centers))]
+true_centers = pd.DataFrame(np.round(true_centers), columns = data.keys())
+true_centers.index = segments
+display(true_centers)
+
+# Display a description of the dataset
+display(data.describe())
+
+# Display the predictions
+for i, pred in enumerate(sample_preds):
+    print("Sample point", i, "predicted to be in Cluster", pred)
+    
+# Display the clustering results based on 'Channel' data
+vs.channel_results(reduced_data, outliers, pca_samples)
+ 
