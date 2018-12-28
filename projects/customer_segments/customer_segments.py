@@ -29,12 +29,27 @@ except:
 display(data.describe())
 
 # TODO: Select three indices of your choice you wish to sample from the dataset
-indices = [1,5,12]
+indices = [1,12,75]
 
 # Create a DataFrame of the chosen samples
 samples = pd.DataFrame(data.loc[indices], columns = data.keys()).reset_index(drop = True)
 print("Chosen samples of wholesale customers dataset:")
 display(samples)
+
+import seaborn as sns
+samples_bar = samples.append(data.describe().loc['mean'])
+samples_bar = samples_bar.append(data.describe().loc['std'])
+samples_bar.index = indices + ['mean'] + ['std']
+_ = samples_bar.plot(kind='bar', figsize=(14,6), title='data with mean and std dev bar plot')
+
+import seaborn as sns
+residual = samples - data.describe().loc['mean']
+resid_sq = residual*residual
+variance = data.describe().loc['std'] * data.describe().loc['std']
+chi_sq_score = resid_sq / variance
+chi_sq_score.index = indices
+_ = chi_sq_score.plot(kind='bar', figsize=(14,6), title='chi sq scores')
+display(chi_sq_score)
 
 
 # --- Implementations: Feature Relevance ---
@@ -94,7 +109,7 @@ for feature in log_data.keys():
     Q3 = np.percentile(log_data[feature], 75)
     
     # TODO: Use the interquartile range to calculate an outlier step (1.5 times the interquartile range)
-    step = 1.5
+    step = 1.5 # 3.0
     
     # Display the outliers
     print("Data points considered outliers for the feature '{}':".format(feature))
@@ -107,9 +122,20 @@ for feature in log_data.keys():
         outliers.append(i)
     
 # OPTIONAL: Select the indices for data points you wish to remove
+import collections
+repeated_outliers=[]
+counter=collections.Counter(outliers)
+print(counter)
+for el in counter:
+    if counter[el]>1:
+        repeated_outliers.append(el)
+        
+print("\nFollowing records are outliers for more than one feature:", list(set(repeated_outliers)))
 
 # Remove the outliers, if any were specified
+outliers = repeated_outliers
 good_data = log_data.drop(log_data.index[outliers]).reset_index(drop = True)
+
 
 # --- Implementations: PCA ---
 
