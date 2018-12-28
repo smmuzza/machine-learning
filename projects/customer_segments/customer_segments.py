@@ -104,12 +104,16 @@ for feature in log_data.keys():
     
     # TODO: Calculate Q1 (25th percentile of the data) for the given feature
     Q1 = np.percentile(log_data[feature], 25)
+    print("Q1:", Q1)
     
     # TODO: Calculate Q3 (75th percentile of the data) for the given feature
     Q3 = np.percentile(log_data[feature], 75)
+    print("Q3:", Q3)
     
     # TODO: Use the interquartile range to calculate an outlier step (1.5 times the interquartile range)
-    step = 1.5 # 3.0
+    IQR = np.abs(Q3-Q1)
+    print("IQR:", IQR)
+    step = 1.5 * IQR # 3.0
     
     # Display the outliers
     print("Data points considered outliers for the feature '{}':".format(feature))
