@@ -56,7 +56,8 @@ display(chi_sq_score)
 
 # TODO: Make a copy of the DataFrame, using the 'drop' function to drop the given feature
 #  	Fresh 	Milk 	Grocery 	Frozen 	Detergents_Paper 	Delicatessen
-featureToDrop = 'Grocery'
+# TODO: Make a copy of the DataFrame, using the 'drop' function to drop the given feature
+featureToDrop = 'Detergents_Paper'
 new_data = data.drop([featureToDrop], axis=1)
 
 # TODO: Split the data into training and testing sets(0.25) using the given feature as the target
@@ -67,13 +68,20 @@ y = data.loc[:,featureToDrop]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
 # TODO: Create a decision tree regressor and fit it to the training set
+# run decision tree many times and average results to get a better score
 from sklearn.tree import DecisionTreeRegressor
-regressor = DecisionTreeRegressor(random_state=0)
-regressor.fit(X_train, y_train)
+sumR2 = 0
+NumRuns = 50
+for i in range(0,NumRuns):
+    regressor = DecisionTreeRegressor(random_state=i)
+    regressor.fit(X_train, y_train)
 
-# TODO: Report the score of the prediction using the testing set
-score = regressor.score(X_test, y_test)
-print('score is: ', score)
+    # TODO: Report the score of the prediction using the testing set
+    score = regressor.score(X_test, y_test)
+    sumR2 = sumR2 + score
+    print('score', i, ' is: ', score)
+
+print('score sum is: ', sumR2/NumRuns) 
 
 # Produce a scatter matrix for each pair of features in the data
 corr = data.corr()
